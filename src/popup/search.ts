@@ -107,8 +107,9 @@ const search = async ({
     })
   ).data;
 
-  const searchResult: SearchResult = {
-    items: res.results.map((data) => {
+  const items: Item[] = [];
+  for (const data of res.results) {
+    try {
       const id = data.id;
       const recordMap = res.recordMap;
       const record = recordMap.block[id].value;
@@ -168,8 +169,14 @@ const search = async ({
       if (result.title) result.title = setStrangeNotionTag(result.title);
       if (result.text) result.text = setStrangeNotionTag(result.text);
 
-      return result;
-    }),
+      items.push(result);
+    } catch (error) {
+      console.error(`Cannot parse item. ` + error, data);
+      continue;
+    }
+  }
+  const searchResult: SearchResult = {
+    items,
     total: res.total,
   };
 
