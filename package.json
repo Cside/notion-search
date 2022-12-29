@@ -8,7 +8,7 @@
     "lint": "yarn run eslint:fix && yarn run prettier && yarn run lint:css:fix",
     "lint:css": "stylelint ./src/**/*.pcss",
     "lint:css:fix": "stylelint --fix ./src/**/*.pcss",
-    "release": "rm out.zip; yarn run build; zip -r out.zip public"
+    "release": "rm out.zip; yarn install && yarn run build && zip -r out.zip public"
   },
   "devDependencies": {
     "@babel/core": "^7.19.6",
