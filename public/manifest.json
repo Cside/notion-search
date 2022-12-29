@@ -3,7 +3,7 @@
   "name": "Notion Search",
   "description": "__MSG_description__",
   "default_locale": "en",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "options_page": "./options.html",
   "action": {
     "default_icon": "./images/icon38.png",
