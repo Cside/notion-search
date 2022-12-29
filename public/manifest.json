@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Notion Search",
-  "description": "Notion search on the popup",
-  "version": "1.2.0",
+  "description": "__MSG_description__",
+  "default_locale": "en",
+  "version": "1.2.1",
   "options_page": "./options.html",
   "action": {
     "default_icon": "./images/icon38.png",
