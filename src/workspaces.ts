@@ -2,18 +2,6 @@ import { axios } from './axios';
 import { STORAGE_KEY } from './constants';
 import { storage } from './storage';
 
-const PATH = '/getSpaces';
-
-type GetWorkspacesApiResponse = {
-  [userId: string]: {
-    space: {
-      [spaceId: string]: {
-        value: { name: string };
-      };
-    };
-  };
-};
-
 export const answerToIndex = (str: string) => {
   str = str
     .trim()
@@ -30,7 +18,8 @@ export type LinkWorkspaceResult =
 export const selectAndLinkWorkspace =
   async (): Promise<LinkWorkspaceResult> => {
     const workspaces: Workspace[] = [];
-    const res = (await axios.post<GetWorkspacesApiResponse>(PATH)).data;
+    const res = (await axios.post<GetWorkspacesApiResponse>('./getSpaces'))
+      .data;
     for (const { space: workspacesObj } of Object.values(res)) {
       for (const [workspaceId, value] of Object.entries(workspacesObj)) {
         workspaces.push({

@@ -14,6 +14,7 @@ let config = {
     popup: './src/popup/main.tsx',
     debug: './src/debug/main.ts',
     options: './src/options/main.tsx',
+    'helps/empty-search-results': './src/helps/emptySearchResults.ts',
   },
   output: {
     path: `${__dirname}/public/js`,

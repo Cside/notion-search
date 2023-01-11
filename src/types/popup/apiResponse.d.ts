@@ -77,3 +77,23 @@ type SearchApiResponse = {
   recordMap: Response.RecordMap;
   total: number;
 };
+
+type GetWorkspacesApiResponse = {
+  [userId: string]: {
+    space: {
+      [spaceId: string]: {
+        value: {
+          name: string;
+        };
+      };
+    };
+    space_view: {
+      [id: string]: {
+        value: {
+          private_pages: string[];
+          space_id: string; // TODO: userId を使う実装になったら不要になる
+        };
+      };
+    };
+  };
+};

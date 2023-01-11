@@ -9,7 +9,8 @@ import {
 import { storage } from '../../../storage';
 import { alertError } from '../../../utils';
 import { SORT_BY, STORAGE_KEY } from '../../constants';
-import { debouncedSearch, search } from '../../search';
+import { debouncedSearch, EmptySearchResultsError, search } from '../../search';
+import { EmptySearchResultsCallout } from '../Callout/EmptySearchResults';
 import { SearchBox } from '../SearchBox';
 import { Sort } from '../Sorts';
 import { Filter } from './../Filters';
@@ -41,6 +42,8 @@ export const SearchContainer = ({
   const [searchResult, setSearchResult] = useState<SearchResult | undefined>(
     undefined,
   );
+  const [hasEmptySearchResultsError, setHasEmptySearchResultsError] =
+    useState(false);
 
   const trimmedQuery = query.trim();
   const hasQuery = trimmedQuery.length > 0;
@@ -69,25 +72,29 @@ export const SearchContainer = ({
         storage.remove(`${workspace.id}-${STORAGE_KEY.LAST_SEARCHED}`);
 
       try {
-        setSearchResult(
-          await (hasQuery ? debouncedSearch : search)({
-            query,
-            sortBy:
-              !hasQuery && sortBy === SORT_BY.RELEVANCE // ad hoc: worthless condition
-                ? SORT_BY.CREATED // 別に last edited でも良いのだが
-                : sortBy,
-            filterByOnlyTitles,
-            savesToStorage: isPopup && hasQuery,
-            workspaceId: workspace.id,
-          }),
-        );
+        const searchResult = await (hasQuery ? debouncedSearch : search)({
+          query,
+          sortBy:
+            !hasQuery && sortBy === SORT_BY.RELEVANCE // ad hoc: worthless condition
+              ? SORT_BY.CREATED // 別に last edited でも良いのだが
+              : sortBy,
+          filterByOnlyTitles,
+          savesToStorage: isPopup && hasQuery,
+          workspaceId: workspace.id,
+        });
+        setSearchResult(searchResult);
         setUsedQuery(query);
+        if (searchResult.total > 0) setHasEmptySearchResultsError(false);
       } catch (error) {
-        alertError(
-          error instanceof AxiosError ? 'Network error' : error + '',
-          error,
-        );
-        throw error;
+        if (error instanceof EmptySearchResultsError) {
+          setHasEmptySearchResultsError(true);
+        } else {
+          alertError(
+            error instanceof AxiosError ? 'Network error' : error + '',
+            error,
+          );
+          throw error;
+        }
       }
     })();
   }, [trimmedQuery, sortBy, filterByOnlyTitles]);
@@ -100,20 +107,19 @@ export const SearchContainer = ({
           setQuery={setQuery}
           workspaceName={workspace.name}
         />
+        {hasEmptySearchResultsError && (
+          <EmptySearchResultsCallout workspace={workspace} />
+        )}
         <Filter
           filterByOnlyTitles={filterByOnlyTitles}
           setFilterOnlyTitles={setFilterOnlyTitles}
         />
         <Sort sortBy={sortBy} setSortBy={setSortBy} />
-        {searchResult && (
-          <>
-            <Items
-              items={searchResult.items}
-              isPopup={isPopup}
-              query={usedQuery}
-            />
-          </>
-        )}
+        <Items
+          items={searchResult?.items || []}
+          isPopup={isPopup}
+          query={usedQuery}
+        />
         <Footer
           isPopup={isPopup}
           total={searchResult?.total || 0}

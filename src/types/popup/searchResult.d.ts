@@ -1,6 +1,6 @@
 type Dir = {
   title: string;
-  block: Block; // workspace, collection は dir から除外してるので
+  block: Response.Block; // workspace, collection は dir から除外してるので
 };
 
 type Item = {
@@ -13,7 +13,7 @@ type Item = {
   };
   dirs: Dir[];
   // type: BlocksInSpace と API に指定している限り workspace, collection は含まれないため
-  block: Block;
+  block: Response.Block;
 };
 
 type SearchResult = {

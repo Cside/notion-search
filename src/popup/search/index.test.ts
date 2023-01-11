@@ -1,6 +1,6 @@
 import { search } from '.';
 import { axios } from '../../axios';
-import { NOTION_HOST } from '../../constants';
+import { NOTION_BASE_URL } from '../../constants';
 import { BLOCK_TYPE, ICON_TYPE, SORT_BY, TABLE_TYPE } from '../constants';
 import { Block } from './Record/Block';
 
@@ -163,7 +163,7 @@ describe('gets an icon', () => {
       input: 'https://exmaple.com/icon.svg',
       expected: {
         type: ICON_TYPE.IMAGE,
-        value: `${NOTION_HOST}/image/${encodeURIComponent(
+        value: `${NOTION_BASE_URL}/image/${encodeURIComponent(
           'https://exmaple.com/icon.svg',
         )}?table=block&id=${BLOCK_ID}&width=40`,
       },
@@ -173,7 +173,7 @@ describe('gets an icon', () => {
       input: '/icon.svg',
       expected: {
         type: ICON_TYPE.IMAGE,
-        value: `${NOTION_HOST}/icon.svg`,
+        value: `${NOTION_BASE_URL}/icon.svg`,
       },
     },
     {

@@ -1,6 +1,6 @@
 import { debounce } from 'throttle-debounce';
 import { axios } from '../../axios';
-import { NOTION_HOST } from '../../constants';
+import { NOTION_BASE_URL } from '../../constants';
 import { storage } from '../../storage';
 
 import { ICON_TYPE, SEARCH_LIMIT, SORT_BY, STORAGE_KEY } from '../constants';
@@ -13,6 +13,8 @@ const PATH = '/search';
 const DEBOUNCE_TIME = 150;
 const ICON_WIDTH = 40;
 const TEXT_NO_TITLE = 'Untitled';
+
+export class EmptySearchResultsError extends Error {}
 
 export const search = async ({
   query,
@@ -68,6 +70,10 @@ export const search = async ({
       source: 'quick_find_input_change',
     })
   ).data;
+
+  if (query === '' && res.results.length === 0) {
+    throw new EmptySearchResultsError(); // 1 件も記事のない ws でも起こりうる
+  }
 
   const recordMap = res.recordMap;
   const items: Item[] = [];
@@ -131,7 +137,7 @@ export const search = async ({
               block.parent.tableType as TableTypeWithoutWorkspace,
             ).reverse(),
         url:
-          `${NOTION_HOST}/${id.replaceAll('-', '')}` +
+          `${NOTION_BASE_URL}/${id.replaceAll('-', '')}` +
           (item.highlightBlockId
             ? `#${item.highlightBlockId.replaceAll('-', '')}`
             : ''),
@@ -148,7 +154,7 @@ export const search = async ({
           result.icon = {
             type: ICON_TYPE.IMAGE,
             value:
-              `${NOTION_HOST}/image/${encodeURIComponent(icon)}?` +
+              `${NOTION_BASE_URL}/image/${encodeURIComponent(icon)}?` +
               new URLSearchParams({
                 table: 'block',
                 id,
@@ -159,7 +165,7 @@ export const search = async ({
           // custom svg
           result.icon = {
             type: ICON_TYPE.IMAGE,
-            value: `${NOTION_HOST}${icon}`,
+            value: `${NOTION_BASE_URL}${icon}`,
           };
         } else {
           // NOTE: 本気でやるなら、ここで絵文字以外のものが来た場合にエラーにする

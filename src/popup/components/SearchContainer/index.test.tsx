@@ -4,10 +4,19 @@ import React from 'react';
 import { $, userEventSetup } from '../../../../test/helpers';
 import { axios } from '../../../axios';
 import { BLOCK_TYPE, SORT_BY, TABLE_TYPE } from '../../constants';
+import * as emptySearchResultsCallout from '../Callout/EmptySearchResults';
 import { QueryParamProvider } from '../QueryParamProvider';
 import { SearchContainer } from '../SearchContainer';
 
-afterEach(() => cleanup());
+beforeEach(() => {
+  jest
+    .spyOn(emptySearchResultsCallout, 'EmptySearchResultsCallout')
+    .mockReturnValue(<></>);
+});
+
+afterEach(() => {
+  cleanup();
+});
 
 beforeAll(() => {
   jest.useFakeTimers(); // debounce 対策
